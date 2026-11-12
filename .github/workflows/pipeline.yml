@@ -1,0 +1,35 @@
+# Runs the ML pipeline on GitHub's machines every time you push.
+name: ml-pipeline
+
+on:
+  push:
+  workflow_dispatch:      # adds a "Run workflow" button on the Actions tab
+  # Stretch goal: retrain every Monday at 02:00 UTC
+  # schedule:
+  #   - cron: "0 2 * * 1"
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Test pipeline stages
+        run: pytest -q
+
+      - name: Run pipeline (collect -> clean -> features -> train -> evaluate)
+        run: python run_pipeline.py
+
+      - name: Upload model and metrics
+        uses: actions/upload-artifact@v4
+        with:
+          name: model
+          path: out/
