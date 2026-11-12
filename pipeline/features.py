@@ -13,4 +13,14 @@ def encode(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
     """
     # TODO (Task 1): move the "3. features" block from train_all.py here.
     # Leave the dead USE_LOG_PRICE experiment behind -- nobody uses it.
-    raise NotImplementedError("features.encode: move the code from train_all.py")
+    df["age"] = df["sold_date"].dt.year - df["year_built"]
+    X = pd.get_dummies(df[["sqft", "bedrooms", "age", "region"]], columns=["region"], dtype=int)
+    y = df["price"]
+
+    # experiment from March: log-transformed price. Didn't help? Not sure. Keep for now.
+    USE_LOG_PRICE = False
+    if USE_LOG_PRICE:
+        import numpy as np
+        y = np.log(y)
+
+    return X, y

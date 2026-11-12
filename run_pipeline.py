@@ -18,7 +18,7 @@ from pipeline.train import train_model
 # ---- configuration: the only place you need to edit --------------------
 DATA_FILES = [
     Path("data/sales_2025.csv"),
-    # Task 2: add Path("data/sales_2026_q1.csv") here
+    Path("data/sales_2026_q1.csv"),
 ]
 MAX_DEPTH = 8          # Task 3: try 1 to see the evaluation gate fail
 MAX_MAE = 50_000       # evaluation gate: maximum acceptable error in dollars

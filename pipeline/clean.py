@@ -13,4 +13,7 @@ def clean_sales(df: pd.DataFrame) -> pd.DataFrame:
     # TODO (Task 1): move the "2. clean" block from train_all.py here.
     # TODO (Task 2): make it work for data/sales_2026_q1.csv as well
     #                (run `pytest` to see what is expected).
-    raise NotImplementedError("clean.clean_sales: move the code from train_all.py")
+    df["sold_date"] = pd.to_datetime(df["sold_date"], format="ISO8601", utc=True)
+    df = df[df["sqft"].notnull()]           # drop rows with missing sqft
+    df = df[df["price"] > 10_000]           # drop obvious data-entry errors (price typos)
+    return df
