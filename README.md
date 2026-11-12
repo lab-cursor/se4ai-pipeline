@@ -127,6 +127,56 @@ The pipeline definition is in `.github/workflows/pipeline.yml`. Read it: it is o
 - **Retrain on a schedule:** uncomment the `schedule:` lines in `.github/workflows/pipeline.yml`.
 - **Validate the data:** make `load_sales` raise a clear error if a required column is missing. Add a test for it.
 
+---
+
+## Optional: orchestrate with Apache Airflow (15–20 min, after Task 2)
+
+GitHub Actions ran your pipeline as one command. A **workflow orchestrator** such as [Apache Airflow](https://airflow.apache.org/) runs each stage as a separate **task**. It knows which tasks depend on which, so it can retry a failed task on its own, show every run in a web UI and start runs on a schedule. [`orchestration/dags/home_value_pipeline.py`](orchestration/dags/home_value_pipeline.py) defines the pipeline as an Airflow **DAG** (directed acyclic graph):
+
+```
+collect ──► clean ──► features ──► train ──► evaluate
+```
+
+Each task calls **your** stage function from `pipeline/` and saves its result as a file in `out/airflow/` for the next task. Finish Tasks 1 and 2 first.
+
+### 1. Get Airflow (5 min)
+
+Airflow does not run natively on Windows, so use a Codespace if you are on Windows or have no Python 3.11+:
+
+- **Codespace with Airflow (recommended):** on your fork, click **Code → Codespaces → ⋯ → New with options**. Under **Dev container configuration**, choose **SE4AI Week 6 pipeline + Apache Airflow**, then **Create codespace**. Setup installs Airflow for you; it takes a few minutes.
+- **Your machine (macOS or Linux, Python 3.11 or newer):** in your activated virtual environment, run
+  ```bash
+  bash orchestration/install_airflow.sh
+  ```
+
+### 2. Run the DAG once in the terminal (3 min)
+
+```bash
+./orchestration/airflow.sh dags test home_value_pipeline
+```
+
+You should see the five tasks run in order, `MAE: $34,585`, and finally `state=success`. The first run also sets up Airflow's database in `.airflow/`, which is ignored by git.
+
+### 3. Watch it in the web UI (10 min)
+
+```bash
+./orchestration/airflow.sh standalone
+```
+
+Wait until the output stops scrolling (about 10–30 seconds). Then open port **8080**: in a Codespace, click **Open in Browser** in the pop-up or the **Ports** tab; on your machine, go to <http://localhost:8080>. There is no login.
+
+1. Open **home_value_pipeline**, click **Trigger** (top right), then **Trigger** again in the dialog. Click the graph icon (**Show Graph**) at the top of the left panel and watch each task turn green.
+2. Click the **evaluate** task and open its **Logs** tab: you should find your MAE.
+3. Break the gate again: set `MAX_DEPTH = 1` in `run_pipeline.py`, save, and trigger a new run. Which task fails, and which tasks still succeed? Set it back to `8`.
+4. Press **Ctrl+C** in the terminal to stop Airflow.
+
+> **Stuck?**
+> - `NotImplementedError` in a task log: finish Task 1 first.
+> - Port 8080 is already in use: stop the other program, or the earlier Airflow, with Ctrl+C.
+> - Codespaces count against your free monthly quota: **stop the Codespace** when you are done (Code → Codespaces → ⋯ → Stop codespace).
+
+**Think about it:** GitHub Actions and Airflow both ran your pipeline. What does Airflow give you that the Actions workflow does not, and what does it cost to run it?
+
 ## Reflection (2 min)
 
 Answer the three questions in [`REFLECTION.md`](REFLECTION.md), then commit and push.
