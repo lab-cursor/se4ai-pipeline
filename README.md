@@ -1,4 +1,4 @@
-# Week 6 exercise: from big-ass script to automated pipeline
+# Week 6 exercise: from script to automated pipeline
 
 * CMKL 41-645 Software Engineering for AI-Enabled Systems
 * Week 6: Automating the ML Pipeline
