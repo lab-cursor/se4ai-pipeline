@@ -65,7 +65,8 @@ The model measures its error as **MAE** (mean absolute error): on average, how m
 | `pipeline/train.py` | Stage 4: fits a decision-tree model. | **Task 1** |
 | `pipeline/evaluate.py` | Stage 5: computes the MAE. It is the **evaluation gate**: if the MAE is above the limit, it stops the pipeline so a weak model is never saved. | No, already written. |
 | `run_pipeline.py` | Runs the five stages in order and saves the model. Its top lines are the settings: which data files to use (`DATA_FILES`), the tree depth (`MAX_DEPTH`) and the gate's limit (`MAX_MAE`, in dollars). | Only the settings: **Task 2** and **Task 3** |
-| `tests/test_clean.py` | Tests that say what the clean stage must guarantee, for the old **and** new data. Run them with `pytest`. | No. Make them pass. |
+| `tests/test_stages.py` | Tests that check the collect and train stages use their inputs (`paths`, `max_depth`). | No. Make them pass in **Task 1**. |
+| `tests/test_clean.py` | Tests that say what the clean stage must guarantee, for the old **and** new data. | No. Make them pass in **Task 2**. |
 | `.github/workflows/pipeline.yml` | The GitHub Actions workflow: on every push, it installs the packages, runs `pytest`, then runs `run_pipeline.py`. | No. Read it in Task 3. |
 | `REFLECTION.md` | Three short questions about what you did. | **Yes**, at the end. |
 
@@ -101,6 +102,13 @@ The model measures its error as **MAE** (mean absolute error): on average, how m
 
 `train_all.py` has six numbered blocks. Move blocks 1–4 into the matching stubs in `pipeline/`. Each stub has a docstring that says what it takes in and what it must return.
 
+Copy the logic, but **make each function use its parameters instead of values written into the script**:
+
+- `load_sales(paths)` must read **every file in `paths`**, not the fixed name `"data/sales_2025.csv"`.
+- `train_model(X, y, max_depth)` must use **`max_depth`**, not the fixed `8`, and must **not** split the data again: `run_pipeline.py` already does the train/test split.
+
+Otherwise, don't fix or improve anything yet. Task 2 is about what goes wrong next.
+
 | Block in `train_all.py` | Goes into |
 |---|---|
 | 1. collect | `pipeline/collect.py` → `load_sales(paths)` |
@@ -110,13 +118,22 @@ The model measures its error as **MAE** (mean absolute error): on average, how m
 
 `evaluate.py` and `run_pipeline.py` are already written.
 
-When you are done:
+When you are done, check your work in two ways:
 
 ```bash
+python3 -m pytest tests/test_stages.py
 python3 run_pipeline.py
 ```
 
-It should print the **same MAE as the script** ($35,734) and save `out/model.joblib` and `out/metrics.json`.
+All three stage tests should pass, and the pipeline should print:
+
+```text
+collected 500 sales
+cleaned   500 sales
+MAE: $35,734 (gate: $50,000)
+```
+
+The MAE must be **exactly the same as the script's**. A different number means a stage does something different from `train_all.py`.
 
 > **Stuck?**
 > - Each function gets its input as a parameter instead of using a global `df`, and must `return` its result.
@@ -134,7 +151,9 @@ It should print the **same MAE as the script** ($35,734) and save `out/model.job
        Path("data/sales_2026_q1.csv"),
    ]
    ```
-2. Run `python3 run_pipeline.py`. It crashes. Open `data/sales_2026_q1.csv` and compare it with the 2025 file. What changed?
+2. Run `python3 run_pipeline.py`. It should now say `collected 650 sales` and then **crash** in `clean_sales` with a `ValueError` about the date format. Open `data/sales_2026_q1.csv` and compare it with the 2025 file. What changed?
+   - Still `collected 500 sales`? `load_sales` is not reading `paths`: go back to Task 1.
+   - `collected 650 sales` but no crash? Your `clean_sales` already handles the new dates. Go on to step 3: the tests will show whether it handles everything.
 3. Run the tests, which describe what the clean stage must guarantee:
    ```bash
    python3 -m pytest
