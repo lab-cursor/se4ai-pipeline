@@ -150,6 +150,21 @@ It should print the **same MAE as the script** ($35,734) and save `out/model.job
 
 ## Task 3. Automate (7 min)
 
+So far, *you* ran the pipeline on *your* machine. In production, it should run without anyone remembering to do it, on a clean machine that does not depend on what happens to be installed on your laptop.
+
+**GitHub Actions** is GitHub's built-in automation service. You describe a **workflow** in a YAML file inside `.github/workflows/`, and GitHub runs it for you on its own machines whenever something happens in the repository. It is free for public repositories. It is commonly used for continuous integration (testing every change), and here it acts as a simple pipeline runner.
+
+The workflow in this repository, [`.github/workflows/pipeline.yml`](.github/workflows/pipeline.yml), uses these terms:
+
+| Term | What it means | In `pipeline.yml` |
+|---|---|---|
+| **Trigger** (`on:`) | The event that starts a run | Every `push`, or a click on **Run workflow** (`workflow_dispatch`) |
+| **Runner** (`runs-on:`) | The fresh virtual machine GitHub starts for each run, then throws away | `ubuntu-latest` (Linux) |
+| **Steps** (`steps:`) | Commands run in order. If one fails, the run stops and turns red | Get the code → install Python and the packages → `pytest` → `python run_pipeline.py` → upload the model |
+| **Artifact** | A file the run keeps after the machine is thrown away, for you to download | `out/` (the trained model and its metrics), named **model** |
+
+Because every run starts from a clean machine, a green run proves the pipeline works from the code in the repository alone, not only on your laptop.
+
 1. On GitHub, open the **Actions** tab of your fork and click **"I understand my workflows, go ahead and enable them"**. Forks start with Actions turned off.
 2. Commit and push your work:
    ```bash
@@ -161,7 +176,7 @@ It should print the **same MAE as the script** ($35,734) and save `out/model.job
 4. Now break it on purpose. Set `MAX_DEPTH = 1` in `run_pipeline.py`, then commit and push. The evaluation gate should fail the run (red ✗), and no model artifact is produced.
 5. Set `MAX_DEPTH` back to `8` and push again, so your latest run is green.
 
-The pipeline definition is in `.github/workflows/pipeline.yml`. Read it: it is only about 30 lines.
+Now open `.github/workflows/pipeline.yml` and find the trigger, the runner, the steps and the artifact from the table above. It is only about 30 lines.
 
 > **Stuck?**
 > - If no run appears, check that Actions is enabled (step 1). You can also click **Run workflow** to start one by hand.
