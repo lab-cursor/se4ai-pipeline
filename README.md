@@ -140,8 +140,15 @@ The pipeline definition is in `.github/workflows/pipeline.yml`. Read it: it is o
 
 GitHub Actions ran your pipeline as one command. A **workflow orchestrator** such as [Apache Airflow](https://airflow.apache.org/) runs each stage as a separate **task**. It knows which tasks depend on which, so it can retry a failed task on its own, show every run in a web UI and start runs on a schedule. [`orchestration/dags/home_value_pipeline.py`](orchestration/dags/home_value_pipeline.py) defines the pipeline as an Airflow **DAG** (directed acyclic graph):
 
-```
-collect ──► clean ──► features ──► train ──► evaluate
+```mermaid
+flowchart LR
+    subgraph dag["Airflow DAG: home_value_pipeline"]
+        direction LR
+        collect["collect"] -- "raw.pkl" --> clean["clean"]
+        clean -- "clean.pkl" --> features["features"]
+        features -- "features.joblib" --> train["train"]
+        train -- "candidate.joblib" --> evaluate{"evaluate<br/>(gate)"}
+    end
 ```
 
 Each task calls **your** stage function from `pipeline/` and saves its result as a file in `out/airflow/` for the next task. Finish Tasks 1 and 2 first.
