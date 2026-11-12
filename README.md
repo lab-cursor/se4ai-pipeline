@@ -1,6 +1,8 @@
 # Week 6 exercise: from big-ass script to automated pipeline
 
-CMKL 41-645 Software Engineering for AI-Enabled Systems · Week 6: Automating the ML Pipeline
+* CMKL 41-645 Software Engineering for AI-Enabled Systems
+* Week 6: Automating the ML Pipeline
+
 **Individual work · about 30 minutes**
 
 ## Learning outcomes
