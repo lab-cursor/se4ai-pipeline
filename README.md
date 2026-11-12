@@ -68,11 +68,6 @@ The model measures its error as **MAE** (mean absolute error): on average, how m
 | `tests/test_clean.py` | Tests that say what the clean stage must guarantee, for the old **and** new data. Run them with `pytest`. | No. Make them pass. |
 | `.github/workflows/pipeline.yml` | The GitHub Actions workflow: on every push, it installs the packages, runs `pytest`, then runs `run_pipeline.py`. | No. Read it in Task 3. |
 | `REFLECTION.md` | Three short questions about what you did. | **Yes**, at the end. |
-| `out/` | Created when you run the code: `model.joblib` (the trained model) and `metrics.json` (its MAE). Not committed to git. | No. |
-| `requirements.txt` | The Python packages: pandas, scikit-learn, pytest. | No. |
-| `.devcontainer/` | Settings for GitHub Codespaces, so a Codespace comes with everything installed. | No. |
-| `orchestration/` | The optional Apache Airflow step (see the end of this README). | No. |
-| `tools/make_data.py` | The script that generated the data. You do not need it. | No. |
 
 ---
 
