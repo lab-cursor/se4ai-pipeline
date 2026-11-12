@@ -79,18 +79,21 @@ The model measures its error as **MAE** (mean absolute error): on average, how m
      ```bash
      git clone https://github.com/<your-username>/se4ai-pipeline.git
      cd se4ai-pipeline
-     python -m venv .venv
+     python3 -m venv .venv            # Windows: py -m venv .venv
      source .venv/bin/activate        # Windows: .venv\Scripts\activate
-     pip install -r requirements.txt
+     python3 -m pip install --upgrade pip
+     python3 -m pip install -r requirements.txt
      ```
    - **No Python installed?** On your fork, click **Code → Codespaces → Create codespace on main**. Everything is installed for you.
 3. Check that the old script still works:
    ```bash
-   python train_all.py
+   python3 train_all.py
    ```
    You should see `MAE: $35,734` and `saved out/model.joblib`.
 
-> **Stuck?** On Windows, try `py` instead of `python`. Always run commands from the repository root (the folder with this README).
+> **Stuck?**
+> - **Windows:** type `python` wherever this README says `python3` (after you activate the virtual environment). Use `py` only to create it.
+> - Always run commands from the repository root (the folder with this README).
 
 ---
 
@@ -110,7 +113,7 @@ The model measures its error as **MAE** (mean absolute error): on average, how m
 When you are done:
 
 ```bash
-python run_pipeline.py
+python3 run_pipeline.py
 ```
 
 It should print the **same MAE as the script** ($35,734) and save `out/model.joblib` and `out/metrics.json`.
@@ -131,12 +134,12 @@ It should print the **same MAE as the script** ($35,734) and save `out/model.job
        Path("data/sales_2026_q1.csv"),
    ]
    ```
-2. Run `python run_pipeline.py`. It crashes. Open `data/sales_2026_q1.csv` and compare it with the 2025 file. What changed?
+2. Run `python3 run_pipeline.py`. It crashes. Open `data/sales_2026_q1.csv` and compare it with the 2025 file. What changed?
 3. Run the tests, which describe what the clean stage must guarantee:
    ```bash
-   pytest
+   python3 -m pytest
    ```
-4. Fix `clean_sales` until `pytest` passes, then run `python run_pipeline.py` again. It should pass the evaluation gate.
+4. Fix `clean_sales` until `pytest` passes, then run `python3 run_pipeline.py` again. It should pass the evaluation gate.
 
 > **Stuck?**
 > - Dates: `pd.to_datetime(df["sold_date"], format="ISO8601", utc=True)` reads both formats.
