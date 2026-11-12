@@ -19,10 +19,17 @@ You work for an online real-estate marketplace that shows a predicted fair value
 
 The data team has just exported the first sales of 2026 (`data/sales_2026_q1.csv`). Your job is to turn the script into a pipeline that can take in new data and run without anyone watching.
 
-```
-collect ──► clean ──► features ──► train ──► evaluate (gate) ──► out/model.joblib
-pipeline/   pipeline/  pipeline/    pipeline/  pipeline/
-collect.py  clean.py   features.py  train.py   evaluate.py   ◄── run_pipeline.py chains them
+```mermaid
+flowchart LR
+    subgraph run["run_pipeline.py chains the stages"]
+        direction LR
+        collect["collect<br/>pipeline/collect.py"] --> clean["clean<br/>pipeline/clean.py"]
+        clean --> features["features<br/>pipeline/features.py"]
+        features --> train["train<br/>pipeline/train.py"]
+        train --> evaluate{"evaluate (gate)<br/>pipeline/evaluate.py"}
+    end
+    evaluate -- "MAE ≤ MAX_MAE" --> model[("out/model.joblib")]
+    evaluate -- "MAE > MAX_MAE" --> stop["stop: model not saved"]
 ```
 
 ---
